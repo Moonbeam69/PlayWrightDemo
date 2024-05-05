@@ -23,7 +23,7 @@ public class Main {
             System.out.println(page.title());
 
             page.locator("//html/body/div/div[2]/header/div/div/a").click();
-            assertThat(page).hasTitle("Installation | Playwright");
+            assertThat(page).hasTitle("Installation | Playwright"); //
 
             System.in.read(); //
 
