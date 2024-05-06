@@ -12,8 +12,10 @@ public class TestRunner {
 
     //mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="codegen https://playwright.dev/"
 
+    @Tag("windows")
     @Test
     public void navigation_TestCase() {
+
         try (Playwright playwright = Playwright.create()) {
             BrowserType browserType = playwright.chromium();
             Browser browser = browserType.launch(new BrowserType.LaunchOptions().setHeadless(false));
@@ -53,6 +55,7 @@ public class TestRunner {
         }
     }
 
+    @Tag("mobile")
     @Test
     public void alt_navigation_TestCase() {
         try (Playwright playwright = Playwright.create()) {
