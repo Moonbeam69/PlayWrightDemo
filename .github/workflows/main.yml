@@ -12,7 +12,7 @@ on:
 
 jobs:
   DevVer:
-    runs-on: [windows, OPENSUSE2]
+    runs-on: [windows-latest]
     strategy:
       matrix:
         browser: [ chrome ]
@@ -55,7 +55,7 @@ jobs:
           path: target/surefire-reports/
 
   DevInt:
-    runs-on: [self-hosted, opensuse]
+    runs-on: [windows-latest]
     needs: DevVer
     strategy:
       matrix:
