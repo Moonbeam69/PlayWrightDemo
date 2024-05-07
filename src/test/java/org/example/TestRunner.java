@@ -6,6 +6,7 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.*;
 import org.junit.jupiter.params.provider.*;
 
+import java.nio.file.*;
 import java.util.*;
 import java.util.regex.*;
 import java.util.stream.*;
@@ -17,37 +18,48 @@ public class TestRunner {
     //mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="codegen https://playwright.dev/"
     //mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="codegen https://www.amazon.co.uk/"
     static BrowserType browserType;
+    static Browser browser;
 
     @BeforeAll
     static void setup() {
-        String browser = System.getProperty("browser");
+        String setbrowser = System.getProperty("browser");
         com.microsoft.playwright.Playwright playwright = com.microsoft.playwright.Playwright.create();
 
-        switch (browser) {
+        switch (setbrowser) {
             case "chrome":
                 browserType = playwright.chromium();
+                browser = browserType.launch(new BrowserType.LaunchOptions().setHeadless(true));
                 break;
             case "firefox":
                 browserType = playwright.firefox();
+                browser = browserType.launch(new BrowserType.LaunchOptions().setHeadless(true));
                 break;
             case "safari":
                 browserType = playwright.webkit();
+                browser = browserType.launch(new BrowserType.LaunchOptions().setHeadless(true));
                 break;
             case "webkit":
                 browserType = playwright.webkit();
+                browser = browserType.launch(new BrowserType.LaunchOptions().setHeadless(true));
+                break;
+            case "brave":
+                browserType = playwright.chromium();
+                Path braveExecutablePath = Path.of("/opt/brave.com/brave");
+                browser = browserType.launch(new BrowserType.LaunchOptions().setExecutablePath(braveExecutablePath).setHeadless(true));
                 break;
             default:
-
+                System.out.println("Browser value " + browser + " does not match expectation");
         }
+
     }
+
     @Tag("windows")
     @Test
     public void navigation_TestCase() {
 
 
-        try(Browser browser = browserType.launch(new BrowserType.LaunchOptions().setHeadless(true))) {
-            BrowserContext context = browser.newContext();
-
+        try(Browser mbrowser = browser ) {
+            BrowserContext context = mbrowser.newContext();
             Page page = context.newPage();
             page.navigate("https://playwright.dev/");
 
@@ -86,8 +98,8 @@ public class TestRunner {
     @Test
     public void alt_navigation_TestCase() {
 
-        try(Browser browser = browserType.launch(new BrowserType.LaunchOptions().setHeadless(true))) {
-            BrowserContext context = browser.newContext();
+        try(Browser mbrowser = browser ) {
+            BrowserContext context = mbrowser.newContext();
             Page page = context.newPage();
 
             page.navigate("https://www.bbc.co.uk/");
@@ -126,8 +138,9 @@ public class TestRunner {
         // List to collect exceptions
         List<Throwable> exceptions = new ArrayList<>();
 
-        try(Browser browser = browserType.launch(new BrowserType.LaunchOptions().setHeadless(true))) {
-            BrowserContext context = browser.newContext();
+        try(Browser mbrowser = browser ) {
+
+            BrowserContext context = mbrowser.newContext();
             Page page = context.newPage();
 
             page.navigate("https://www.amazon.co.uk/");
