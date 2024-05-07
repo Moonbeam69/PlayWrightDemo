@@ -42,7 +42,7 @@ jobs:
       - name: Start timing
         run: echo "START_TIME=$(date +%s)" >> $GITHUB_ENV
       - name: Build & Test DevVer with Maven
-        run: mvn -B package --file UTpom.xml -Denvironment=DevVer -Dbrowser=${{ matrix.browser }}
+        run: mvn -B test --file pom.xml
       - name: End timing
         run: |
           END_TIME=$(date +%s)
@@ -69,7 +69,7 @@ jobs:
           distribution: 'temurin'
           cache: maven
       - name: Build & Test DevInt with Maven
-        run: mvn -B package --file pom.xml -Denvironment=DevInt -Dbrowser=${{ matrix.browser }}
+        run: mvn -B test --file pom.xml
       - name: Upload test results
         uses: actions/upload-artifact@v4
         with:
@@ -91,14 +91,7 @@ jobs:
           distribution: 'temurin'
           cache: maven
       - name: Build & test SIT with Maven
-        run: mvn -B package --file pom.xml -Denvironment=SIT -Dbrowser=${{ matrix.browser }}
-
-      - name: Remove remove previous Docker DevInt container instance
-        run: docker rm -f SIT
-      - name: Build Docker image
-        run: docker build . --file Dockerfile_SIT --tag cicd_project_image:SIT
-      - name: Run docker image
-        run: docker run --name SIT cicd_project_image:SIT
+        run: mvn -B test --file pom.xml
 
       - name: Upload test results
         uses: actions/upload-artifact@v4
