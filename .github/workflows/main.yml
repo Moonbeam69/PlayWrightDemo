@@ -12,7 +12,7 @@ on:
 
 jobs:
   DevVer:
-    runs-on: [self-hosted, OPENSUSE2]
+    runs-on: [windows, OPENSUSE2]
     strategy:
       matrix:
         browser: [ chrome ]
