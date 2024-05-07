@@ -2,15 +2,21 @@ package org.example;
 
 import com.microsoft.playwright.*;
 import com.microsoft.playwright.options.*;
+import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.*;
+import org.junit.jupiter.params.provider.*;
 
+import java.util.*;
 import java.util.regex.*;
+import java.util.stream.*;
 
 import static com.microsoft.playwright.assertions.PlaywrightAssertions.*;
 
 public class TestRunner {
 
     //mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="codegen https://playwright.dev/"
+    //mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="codegen https://www.amazon.co.uk/"
 
     @Tag("windows")
     @Test
@@ -59,20 +65,91 @@ public class TestRunner {
     @Test
     public void alt_navigation_TestCase() {
         try (Playwright playwright = Playwright.create()) {
-            BrowserType browserType = playwright.chromium();
-            Browser browser = browserType.launch(new BrowserType.LaunchOptions().setHeadless(false));
+            SoftAssertions softly = new SoftAssertions();
+
+            Browser browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(false));
             BrowserContext context = browser.newContext();
-
             Page page = context.newPage();
-            page.navigate("https://playwright.dev/");
 
-            assertThat(page).hasTitle(Pattern.compile("Fast and reliable end-to-end testing for modern web apps | Playwright Java"));
+            page.navigate("https://www.bbc.co.uk/");
 
-            Locator link = page.getByRole(AriaRole.LINK, new Page.GetByRoleOptions().setName("Get started"));
-            link.click();
+            page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Yes, I agree")).click();
+            page.getByTestId("header-content").getByRole(AriaRole.LINK, new Locator.GetByRoleOptions().setName("News")).click();
 
-            assertThat(page).hasTitle(Pattern.compile("Installation | Playwright")); //
+            assertThat(page.getByTestId("masthead")).containsText("BBC News");
+            assertThat(page.locator("#product-navigation-menu")).containsText("Home");
+            assertThat(page.getByTestId("more-menu-button").getByRole(AriaRole.BUTTON)).containsText("More");
+            assertThat(page.getByTestId("sign-in-banner").getByRole(AriaRole.HEADING)).containsText("Discover your BBC");
+            page.getByTestId("header-content").getByRole(AriaRole.LINK, new Locator.GetByRoleOptions().setName("Sport")).click();
+            assertThat(page.getByTestId("masthead")).containsText("BBC Sport");
+            assertThat(page.getByTestId("navigation").getByRole(AriaRole.LIST)).containsText("Home");
+            assertThat(page.getByTestId("more-menu-button").getByRole(AriaRole.BUTTON)).containsText("More");
+            assertThat(page.getByTestId("header-content").getByRole(AriaRole.LINK, new Locator.GetByRoleOptions().setName("Weather"))).isVisible();
+            page.getByTestId("header-content").getByRole(AriaRole.LINK, new Locator.GetByRoleOptions().setName("Weather")).click();
+            assertThat(page.locator("form")).containsText("Search");
+            assertThat(page.getByPlaceholder("Enter a town, city or UK")).isVisible();
+            assertThat(page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Find my location"))).isVisible();
+            page.getByLabel("BBC-wide").getByRole(AriaRole.LINK, new Locator.GetByRoleOptions().setName("iPlayer")).click();
+            assertThat(page.locator("#main")).containsText("iPlayer NavigationiPlayer Accessibility HelpMenu");
+            page.getByLabel("BBC-wide").getByRole(AriaRole.LINK, new Locator.GetByRoleOptions().setName("Sounds")).click();
+            assertThat(page.getByLabel("BBC Sounds", new Page.GetByLabelOptions().setExact(true))).containsText("BBC SoundsSounds home pageMenuHomeMusicPodcastsMy Sounds");
+            page.getByLabel("BBC-wide").getByRole(AriaRole.LINK, new Locator.GetByRoleOptions().setName("Bitesize")).click();
+
+            assertThat(page.getByTestId("masthead")).containsText("Bitesize!");
+            softly.assertThat(1 + 1).isEqualTo(2);
 
         }
+    }
+
+    @Tag("data")
+    @ParameterizedTest
+    @MethodSource("testData")
+    public void testdata_TestCase(String product, String result) {
+        // List to collect exceptions
+        List<Throwable> exceptions = new ArrayList<>();
+
+        try (Playwright playwright = Playwright.create()) {
+            SoftAssertions softly = new SoftAssertions();
+            Browser browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(false));
+            BrowserContext context = browser.newContext();
+            Page page = context.newPage();
+
+            page.navigate("https://www.amazon.co.uk/");
+
+            page.getByLabel("Accept").click();
+            page.getByPlaceholder("Search Amazon.co.uk").click();
+            page.getByPlaceholder("Search Amazon.co.uk").fill(product);
+            page.getByPlaceholder("Search Amazon.co.uk").press("Enter");
+            page.getByLabel("navigation").getByRole(AriaRole.BUTTON, new Locator.GetByRoleOptions().setName("Go")).click();
+
+            customAssert(() -> assertThat(page.locator("#search")).containsText(result), exceptions);
+
+            // Throw any collected exceptions after the test case is finished
+            if (!exceptions.isEmpty()) {
+                throw new AssertionError("One or more assertions failed:", exceptions.get(0));
+            }
+
+
+        }
+
+    }
+    static Stream<Arguments> testData() {
+        return Stream.of(
+                Arguments.of("cleaner", "Results"),
+                Arguments.of("mixer", "Results"),
+                Arguments.of("dryer", "Results")
+        );
+    }
+
+    private void customAssert(Executable executable, List<Throwable> exceptions) {
+        try {
+            executable.execute();
+        } catch (Throwable t) {
+            exceptions.add(t);
+        }
+    }
+
+    interface Executable {
+        void execute() throws Throwable;
     }
 }
