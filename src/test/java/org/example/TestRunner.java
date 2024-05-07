@@ -44,7 +44,7 @@ public class TestRunner {
                 break;
             case "brave":
                 browserType = playwright.chromium();
-                Path braveExecutablePath = Path.of("/opt/brave.com/brave");
+                Path braveExecutablePath = Path.of("/opt/brave.com/brave/");
                 browser = browserType.launch(new BrowserType.LaunchOptions().setExecutablePath(braveExecutablePath).setHeadless(true));
                 break;
             default:
