@@ -12,7 +12,7 @@ on:
 
 jobs:
   DevVer:
-    runs-on: [windows-latest]
+    runs-on: [linux-latest]
     strategy:
       matrix:
         browser: [ chrome ]
@@ -55,7 +55,7 @@ jobs:
           path: target/surefire-reports/
 
   DevInt:
-    runs-on: [windows-latest]
+    runs-on: [linux-latest]
     needs: DevVer
     strategy:
       matrix:
@@ -77,7 +77,7 @@ jobs:
           path: target/surefire-reports/
 
   SIT:
-    runs-on: [self-hosted, windows]
+    runs-on: [linux-latest]
     needs: DevInt
     strategy:
       matrix:
@@ -107,7 +107,7 @@ jobs:
           path: target/surefire-reports/
 
   Production:
-    runs-on: [self-hosted, OPENSUSE2]
+    runs-on: [linux-latest]
     needs: SIT
     steps:
       - uses: actions/checkout@v4
