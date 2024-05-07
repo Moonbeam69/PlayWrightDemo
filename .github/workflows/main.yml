@@ -1,0 +1,119 @@
+name: Build & Test in DevVer and SIT
+
+env:
+  ACTIONS_STEP_DEBUG: true
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+  workflow_dispatch:
+
+jobs:
+  DevVer:
+    runs-on: [self-hosted, OPENSUSE2]
+    strategy:
+      matrix:
+        browser: [ chrome ]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache JDK
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/jdk
+          key: ${{ runner.os }}-jdk19-${{ hashFiles('**/pom.xml') }}
+
+      - name: Start timing
+        run: echo "START_TIME=$(date +%s)" >> $GITHUB_ENV
+      - name: Set up JDK 19
+        uses: actions/setup-java@v4
+        with:
+          java-version: '19'
+          distribution: 'temurin'
+          cache: maven
+      - name: End timing
+        run: |
+          END_TIME=$(date +%s)
+          echo "Process took $((END_TIME - START_TIME)) seconds to complete"
+
+      - name: Start timing
+        run: echo "START_TIME=$(date +%s)" >> $GITHUB_ENV
+      - name: Build & Test DevVer with Maven
+        run: mvn -B package --file UTpom.xml -Denvironment=DevVer -Dbrowser=${{ matrix.browser }}
+      - name: End timing
+        run: |
+          END_TIME=$(date +%s)
+          echo "Process took $((END_TIME - START_TIME)) seconds to complete"
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        with:
+          name: DevVer test results ${{ matrix.browser }} - ${{ github.run_id }}
+          path: target/surefire-reports/
+
+  DevInt:
+    runs-on: [self-hosted, opensuse]
+    needs: DevVer
+    strategy:
+      matrix:
+        browser: [ chrome, firefox ]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 19
+        uses: actions/setup-java@v4
+        with:
+          java-version: '19'
+          distribution: 'temurin'
+          cache: maven
+      - name: Build & Test DevInt with Maven
+        run: mvn -B package --file pom.xml -Denvironment=DevInt -Dbrowser=${{ matrix.browser }}
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        with:
+          name: DevInt test results ${{ matrix.browser }} - ${{ github.run_id }}
+          path: target/surefire-reports/
+
+  SIT:
+    runs-on: [self-hosted, windows]
+    needs: DevInt
+    strategy:
+      matrix:
+        browser: [chrome,firefox,safari]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 19
+        uses: actions/setup-java@v4
+        with:
+          java-version: '19'
+          distribution: 'temurin'
+          cache: maven
+      - name: Build & test SIT with Maven
+        run: mvn -B package --file pom.xml -Denvironment=SIT -Dbrowser=${{ matrix.browser }}
+
+      - name: Remove remove previous Docker DevInt container instance
+        run: docker rm -f SIT
+      - name: Build Docker image
+        run: docker build . --file Dockerfile_SIT --tag cicd_project_image:SIT
+      - name: Run docker image
+        run: docker run --name SIT cicd_project_image:SIT
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        with:
+          name: SIT test results ${{ matrix.browser }} - ${{ github.run_id }}
+          path: target/surefire-reports/
+
+  Production:
+    runs-on: [self-hosted, OPENSUSE2]
+    needs: SIT
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 19
+        uses: actions/setup-java@v4
+        with:
+          java-version: '19'
+          distribution: 'temurin'
+          cache: maven
