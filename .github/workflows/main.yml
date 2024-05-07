@@ -42,7 +42,7 @@ jobs:
       - name: Start timing
         run: echo "START_TIME=$(date +%s)" >> $GITHUB_ENV
       - name: Build & Test DevVer with Maven
-        run: mvn -B test  -D ${{ matrix.browser }} --file pom.xml
+        run: mvn -B test  -D browser=${{ matrix.browser }} --file pom.xml
       - name: End timing
         run: |
           END_TIME=$(date +%s)
@@ -69,7 +69,7 @@ jobs:
           distribution: 'temurin'
           cache: maven
       - name: Build & Test DevInt with Maven
-        run: mvn -B test -D ${{ matrix.browser }} --file pom.xml
+        run: mvn -B test -D browser=${{ matrix.browser }} --file pom.xml
       - name: Upload test results
         uses: actions/upload-artifact@v4
         with:
@@ -91,7 +91,7 @@ jobs:
           distribution: 'temurin'
           cache: maven
       - name: Build & test SIT with Maven
-        run: mvn -B test  -D ${{ matrix.browser }}  --file pom.xml
+        run: mvn -B test  -D browser=${{ matrix.browser }}  --file pom.xml
 
       - name: Upload test results
         uses: actions/upload-artifact@v4
