@@ -59,7 +59,7 @@ jobs:
     needs: DevVer
     strategy:
       matrix:
-        browser: [ chrome, firefox ]
+        browser: [ chrome ]
     steps:
       - uses: actions/checkout@v4
       - name: Set up JDK 19
@@ -81,7 +81,7 @@ jobs:
     needs: DevInt
     strategy:
       matrix:
-        browser: [chrome,firefox,webkit]
+        browser: [chrome, brave ]
     steps:
       - uses: actions/checkout@v4
       - name: Set up JDK 19
@@ -100,7 +100,7 @@ jobs:
           path: target/surefire-reports/
 
   Production:
-    runs-on: [linux-latest]
+    runs-on: [self-hosted]
     needs: SIT
     steps:
       - uses: actions/checkout@v4
