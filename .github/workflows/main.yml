@@ -81,7 +81,7 @@ jobs:
     needs: DevInt
     strategy:
       matrix:
-        browser: [chrome,firefox,safari]
+        browser: [chrome,firefox,webkit]
     steps:
       - uses: actions/checkout@v4
       - name: Set up JDK 19

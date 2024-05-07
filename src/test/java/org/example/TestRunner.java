@@ -2,7 +2,6 @@ package org.example;
 
 import com.microsoft.playwright.*;
 import com.microsoft.playwright.options.*;
-import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.*;
 import org.junit.jupiter.params.provider.*;
@@ -17,14 +16,36 @@ public class TestRunner {
 
     //mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="codegen https://playwright.dev/"
     //mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="codegen https://www.amazon.co.uk/"
+    static BrowserType browserType;
 
+    @BeforeAll
+    static void setup() {
+        String browser = System.getProperty("browser");
+        com.microsoft.playwright.Playwright playwright = com.microsoft.playwright.Playwright.create();
+
+        switch (browser) {
+            case "chrome":
+                browserType = playwright.chromium();
+                break;
+            case "firefox":
+                browserType = playwright.firefox();
+                break;
+            case "safari":
+                browserType = playwright.webkit();
+                break;
+            case "webkit":
+                browserType = playwright.webkit();
+                break;
+            default:
+
+        }
+    }
     @Tag("windows")
     @Test
     public void navigation_TestCase() {
 
-        try (Playwright playwright = Playwright.create()) {
-            BrowserType browserType = playwright.chromium();
-            Browser browser = browserType.launch(new BrowserType.LaunchOptions().setHeadless(false));
+
+        try(Browser browser = browserType.launch(new BrowserType.LaunchOptions().setHeadless(true))) {
             BrowserContext context = browser.newContext();
 
             Page page = context.newPage();
@@ -64,10 +85,8 @@ public class TestRunner {
     @Tag("mobile")
     @Test
     public void alt_navigation_TestCase() {
-        try (Playwright playwright = Playwright.create()) {
-            SoftAssertions softly = new SoftAssertions();
 
-            Browser browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(false));
+        try(Browser browser = browserType.launch(new BrowserType.LaunchOptions().setHeadless(true))) {
             BrowserContext context = browser.newContext();
             Page page = context.newPage();
 
@@ -96,7 +115,6 @@ public class TestRunner {
             page.getByLabel("BBC-wide").getByRole(AriaRole.LINK, new Locator.GetByRoleOptions().setName("Bitesize")).click();
 
             assertThat(page.getByTestId("masthead")).containsText("Bitesize!");
-            softly.assertThat(1 + 1).isEqualTo(2);
 
         }
     }
@@ -108,9 +126,7 @@ public class TestRunner {
         // List to collect exceptions
         List<Throwable> exceptions = new ArrayList<>();
 
-        try (Playwright playwright = Playwright.create()) {
-            SoftAssertions softly = new SoftAssertions();
-            Browser browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(false));
+        try(Browser browser = browserType.launch(new BrowserType.LaunchOptions().setHeadless(true))) {
             BrowserContext context = browser.newContext();
             Page page = context.newPage();
 
