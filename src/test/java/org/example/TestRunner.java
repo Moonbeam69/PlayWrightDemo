@@ -145,7 +145,9 @@ public class TestRunner {
 
             page.navigate("https://www.amazon.co.uk/");
 
-            page.getByLabel("Accept").click();
+            if (page.getByLabel("Accept").isVisible()) {
+                page.getByLabel("Accept").click();
+            }
             page.getByPlaceholder("Search Amazon.co.uk").click();
             page.getByPlaceholder("Search Amazon.co.uk").fill(product);
             page.getByPlaceholder("Search Amazon.co.uk").press("Enter");
