@@ -138,9 +138,9 @@ public class TestRunner {
         // List to collect exceptions
         List<Throwable> exceptions = new ArrayList<>();
 
-        try(Browser mbrowser = browser ) {
+//        try(browser ) {
 
-            BrowserContext context = mbrowser.newContext();
+            BrowserContext context = browser.newContext();
             Page page = context.newPage();
 
             page.navigate("https://www.amazon.co.uk/");
@@ -159,7 +159,7 @@ public class TestRunner {
             }
 
 
-        }
+//        }
 
     }
     static Stream<Arguments> testData() {
