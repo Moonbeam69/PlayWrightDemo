@@ -34,6 +34,7 @@ jobs:
           java-version: '19'
           distribution: 'temurin'
           cache: maven
+          cache-path: ~/jdk
       - name: End timing
         run: |
           END_TIME=$(date +%s)
