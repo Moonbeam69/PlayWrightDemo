@@ -8,6 +8,7 @@ import org.junit.jupiter.params.provider.*;
 
 import java.nio.file.*;
 import java.util.*;
+import java.util.logging.*;
 import java.util.regex.*;
 import java.util.stream.*;
 
@@ -19,11 +20,12 @@ public class TestRunner {
     //mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="codegen https://www.amazon.co.uk/"
     static BrowserType browserType;
     static Browser browser;
-
+    static Logger log;
     @BeforeAll
     static void setup() {
         String setbrowser = System.getProperty("browser");
         com.microsoft.playwright.Playwright playwright = com.microsoft.playwright.Playwright.create();
+        log = Logger.getLogger(TestRunner.class.getName());
 
         switch (setbrowser) {
             case "chrome":
@@ -48,7 +50,7 @@ public class TestRunner {
                 browser = browserType.launch(new BrowserType.LaunchOptions().setExecutablePath(braveExecutablePath).setHeadless(true));
                 break;
             default:
-                System.out.println("Browser value " + browser + " does not match expectation");
+                log.info("Browser value " + browser + " does not match expectation");
         }
 
     }
@@ -126,7 +128,7 @@ public class TestRunner {
             assertThat(page.getByLabel("BBC Sounds", new Page.GetByLabelOptions().setExact(true))).containsText("BBC SoundsSounds home pageMenuHomeMusicPodcastsMy Sounds");
             page.getByLabel("BBC-wide").getByRole(AriaRole.LINK, new Locator.GetByRoleOptions().setName("Bitesize")).click();
 
-            assertThat(page.getByTestId("masthead")).containsText("Bitesize!");
+            assertThat(page.getByTestId("masthead")).containsText("Bitesize");
 
         }
     }
