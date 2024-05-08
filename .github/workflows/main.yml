@@ -33,8 +33,8 @@ jobs:
         with:
           java-version: '19'
           distribution: 'temurin'
-          cache: maven
-          cache-path: ~/jdk
+          cache: Cache JDK
+
       - name: End timing
         run: |
           END_TIME=$(date +%s)
@@ -68,7 +68,7 @@ jobs:
         with:
           java-version: '19'
           distribution: 'temurin'
-          cache: maven
+          cache: Cache JDK
       - name: Build & Test DevInt with Maven
         run: mvn -B test -D browser=${{ matrix.browser }} --file pom.xml
       - name: Upload test results
@@ -90,7 +90,7 @@ jobs:
         with:
           java-version: '19'
           distribution: 'temurin'
-          cache: maven
+          cache: Cache JDK
       - name: Build & test SIT with Maven
         run: mvn -B test  -D browser=${{ matrix.browser }}  --file pom.xml
 
@@ -110,4 +110,4 @@ jobs:
         with:
           java-version: '19'
           distribution: 'temurin'
-          cache: maven
+          cache: Cache JDK
