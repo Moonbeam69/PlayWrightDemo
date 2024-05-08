@@ -29,6 +29,7 @@ jobs:
 
       - name: Start timing
         run: echo "START_TIME=$(date +%s)" >> $GITHUB_ENV
+
       - name: Set up JDK 19
         uses: actions/setup-java@v4
         with:
