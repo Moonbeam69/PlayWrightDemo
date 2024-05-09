@@ -15,7 +15,7 @@ jobs:
     runs-on: [self-hosted]
     strategy:
       matrix:
-        browser: [ brave ]
+        browser: [ chrome ]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
