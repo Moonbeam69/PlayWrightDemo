@@ -58,6 +58,7 @@
                     <groups>mobile</groups>
                     <excludedGroups>data,windows</excludedGroups>
                 </configuration>
+
             </plugin>
         </plugins>
 
