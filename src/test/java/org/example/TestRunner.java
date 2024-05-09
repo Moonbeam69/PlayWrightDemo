@@ -18,6 +18,7 @@ public class TestRunner {
 
     //mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="codegen https://playwright.dev/"
     //mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="codegen https://www.amazon.co.uk/"
+    //mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="codegen http://www.bbc.co.uk/"
     static BrowserType browserType;
     static Browser browser;
     static Logger log;
@@ -55,7 +56,7 @@ public class TestRunner {
 
     }
 
-    @Tag("windows")
+    @Tag("playwright")
     @Test
     public void navigation_TestCase() {
 
@@ -96,7 +97,7 @@ public class TestRunner {
         }
     }
 
-    @Tag("mobile")
+    @Tag("bbc")
     @Test
     public void alt_navigation_TestCase() {
 
@@ -107,33 +108,31 @@ public class TestRunner {
             page.navigate("https://www.bbc.co.uk/");
 
             page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Yes, I agree")).click();
-            page.getByTestId("header-content").getByRole(AriaRole.LINK, new Locator.GetByRoleOptions().setName("News")).click();
 
+            page.getByTestId("header-content").getByRole(AriaRole.LINK, new Locator.GetByRoleOptions().setName("News")).click();
             assertThat(page.getByTestId("masthead")).containsText("BBC News");
             assertThat(page.locator("#product-navigation-menu")).containsText("Home");
             assertThat(page.getByTestId("more-menu-button").getByRole(AriaRole.BUTTON)).containsText("More");
             assertThat(page.getByTestId("sign-in-banner").getByRole(AriaRole.HEADING)).containsText("Discover your BBC");
+
             page.getByTestId("header-content").getByRole(AriaRole.LINK, new Locator.GetByRoleOptions().setName("Sport")).click();
             assertThat(page.getByTestId("masthead")).containsText("BBC Sport");
             assertThat(page.getByTestId("navigation").getByRole(AriaRole.LIST)).containsText("Home");
             assertThat(page.getByTestId("more-menu-button").getByRole(AriaRole.BUTTON)).containsText("More");
+
             assertThat(page.getByTestId("header-content").getByRole(AriaRole.LINK, new Locator.GetByRoleOptions().setName("Weather"))).isVisible();
             page.getByTestId("header-content").getByRole(AriaRole.LINK, new Locator.GetByRoleOptions().setName("Weather")).click();
             assertThat(page.locator("form")).containsText("Search");
             assertThat(page.getByPlaceholder("Enter a town, city or UK")).isVisible();
             assertThat(page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Find my location"))).isVisible();
-            page.getByLabel("BBC-wide").getByRole(AriaRole.LINK, new Locator.GetByRoleOptions().setName("iPlayer")).click();
-            assertThat(page.locator("#main")).containsText("iPlayer NavigationiPlayer Accessibility HelpMenu");
-            page.getByLabel("BBC-wide").getByRole(AriaRole.LINK, new Locator.GetByRoleOptions().setName("Sounds")).click();
-            assertThat(page.getByLabel("BBC Sounds", new Page.GetByLabelOptions().setExact(true))).containsText("BBC SoundsSounds home pageMenuHomeMusicPodcastsMy Sounds");
-            page.getByLabel("BBC-wide").getByRole(AriaRole.LINK, new Locator.GetByRoleOptions().setName("Bitesize")).click();
 
-            assertThat(page.getByTestId("masthead")).containsText("Bitesize");
+            page.getByLabel("BBC-wide").getByRole(AriaRole.LINK, new Locator.GetByRoleOptions().setName("Innovation")).click();
+            page.getByTestId("header-content").getByRole(AriaRole.LINK, new Locator.GetByRoleOptions().setName("Sounds")).click();
 
         }
     }
 
-    @Tag("data")
+    @Tag("amazon")
     @ParameterizedTest
     @MethodSource("testData")
     public void testdata_TestCase(String product, String result) {

@@ -46,8 +46,8 @@
                 <version>3.10.1</version>
                 <!-- References to interface static methods are allowed only at source level 1.8 or above -->
                 <configuration>
-                    <source>19</source>
-                    <target>19</target>
+                    <source>17</source>
+                    <target>17</target>
                 </configuration>
             </plugin>
             <plugin>
@@ -55,8 +55,8 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.0.0-M9</version> <!-- Ensure compatibility with JUnit 5 -->
                 <configuration>
-                    <groups>mobile</groups>
-                    <excludedGroups>data,windows</excludedGroups>
+                    <groups>bbc</groups>
+                    <excludedGroups>amazon,playwright</excludedGroups>
                 </configuration>
 
             </plugin>
