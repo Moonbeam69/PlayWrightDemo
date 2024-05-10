@@ -66,6 +66,7 @@ public class TestRunner {
             Page page = context.newPage();
             page.navigate("https://playwright.dev/");
 
+
             assertThat(page).hasTitle(Pattern.compile("Fast and reliable end-to-end testing for modern web apps | Playwright Java"));
 
             page.getByRole(AriaRole.LINK, new Page.GetByRoleOptions().setName("Get started")).click();
