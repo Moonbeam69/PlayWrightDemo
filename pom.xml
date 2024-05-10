@@ -55,8 +55,8 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.0.0-M9</version> <!-- Ensure compatibility with JUnit 5 -->
                 <configuration>
-                    <groups>bbc</groups>
-                    <excludedGroups>amazon,playwright</excludedGroups>
+                    <groups>playwright</groups>
+                    <excludedGroups>amazon,bbc</excludedGroups>
                 </configuration>
 
             </plugin>
